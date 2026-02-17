@@ -60,14 +60,14 @@ const ProductCatalog = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
   const sortOptions: SortOption[] = [
-    { field: 'name', direction: 'asc', label: 'Name (A-Z)' },
-    { field: 'name', direction: 'desc', label: 'Name (Z-A)' },
-    { field: 'price', direction: 'asc', label: 'Price (Low to High)' },
-    { field: 'price', direction: 'desc', label: 'Price (High to Low)' },
-    { field: 'brand.name', direction: 'asc', label: 'Brand (A-Z)' },
-    { field: 'brand.name', direction: 'desc', label: 'Brand (Z-A)' },
-    { field: 'category.name', direction: 'asc', label: 'Category (A-Z)' },
-    { field: 'category.name', direction: 'desc', label: 'Category (Z-A)' }
+    { field: 'name', direction: 'asc', label: 'Nombre (A-Z)' },
+    { field: 'name', direction: 'desc', label: 'Nombre (Z-A)' },
+    { field: 'price', direction: 'asc', label: 'Precio (Menor a Mayor)' },
+    { field: 'price', direction: 'desc', label: 'Precio (Mayor a Menor)' },
+    { field: 'brand.name', direction: 'asc', label: 'Marca (A-Z)' },
+    { field: 'brand.name', direction: 'desc', label: 'Marca (Z-A)' },
+    { field: 'category.name', direction: 'asc', label: 'Categoría (A-Z)' },
+    { field: 'category.name', direction: 'desc', label: 'Categoría (Z-A)' }
   ]
 
   const buildQueryString = (page: number) => {
@@ -94,7 +94,7 @@ const ProductCatalog = () => {
       const response = await fetch(`http://localhost:8080/api/products?${queryString}`)
 
       if (!response.ok) {
-        throw new Error('Failed to fetch products')
+        throw new Error('Error al cargar los productos')
       }
 
       const data: ApiResponse = await response.json()
@@ -102,7 +102,7 @@ const ProductCatalog = () => {
       setTotalPages(data.totalPages)
       setCurrentPage(data.number)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : 'Ha ocurrido un error')
     } finally {
       setLoading(false)
     }
@@ -135,7 +135,7 @@ const ProductCatalog = () => {
         setCategories(uniqueCategories)
       }
     } catch (err) {
-      console.error('Failed to fetch products for filters:', err)
+      console.error('Error al cargar productos para filtros:', err)
     }
   }
 
@@ -179,7 +179,7 @@ const ProductCatalog = () => {
   }
 
   if (loading) {
-    return <div className="loading">Loading products...</div>
+    return <div className="loading">Cargando productos...</div>
   }
 
   if (error) {
@@ -188,14 +188,14 @@ const ProductCatalog = () => {
 
   return (
     <div className="product-catalog">
-      <h1>Product Catalog</h1>
+      <h1>Catálogo de Productos</h1>
 
       <div className="filters-section">
-        <h3>Filters & Sorting</h3>
+        <h3>Filtros y Ordenamiento</h3>
 
         <div className="filters-grid">
           <div className="filter-group">
-            <label>Sort By</label>
+            <label>Ordenar por</label>
             <select
               value={`${sortBy}:${sortDirection}`}
               onChange={(e) => handleSortChange(e.target.value)}
@@ -208,18 +208,18 @@ const ProductCatalog = () => {
             </select>
           </div>
           <div className="filter-group">
-            <label>Price Range</label>
+            <label>Rango de Precio</label>
             <div className="price-inputs">
               <input
                 type="number"
-                placeholder="Min Price"
+                placeholder="Precio Mínimo"
                 value={filters.minPrice}
                 onChange={(e) => handleFilterChange('minPrice', e.target.value)}
               />
               <span>-</span>
               <input
                 type="number"
-                placeholder="Max Price"
+                placeholder="Precio Máximo"
                 value={filters.maxPrice}
                 onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
               />
@@ -227,12 +227,12 @@ const ProductCatalog = () => {
           </div>
 
           <div className="filter-group">
-            <label>Brand</label>
+            <label>Marca</label>
             <select
               value={filters.brand}
               onChange={(e) => handleFilterChange('brand', e.target.value)}
             >
-              <option value="">All Brands</option>
+              <option value="">Todas las Marcas</option>
               {brands.map(brand => (
                 <option key={brand.id} value={brand.name}>{brand.name}</option>
               ))}
@@ -240,12 +240,12 @@ const ProductCatalog = () => {
           </div>
 
           <div className="filter-group">
-            <label>Category</label>
+            <label>Categoría</label>
             <select
               value={filters.category}
               onChange={(e) => handleFilterChange('category', e.target.value)}
             >
-              <option value="">All Categories</option>
+              <option value="">Todas las Categorías</option>
               {categories.map(category => (
                 <option key={category.id} value={category.name}>{category.name}</option>
               ))}
@@ -253,7 +253,7 @@ const ProductCatalog = () => {
           </div>
 
           <div className="filter-actions">
-            <button onClick={clearFilters}>Clear Filters</button>
+            <button onClick={clearFilters}>Limpiar Filtros</button>
           </div>
         </div>
       </div>
@@ -275,18 +275,18 @@ const ProductCatalog = () => {
           onClick={(e) => handlePageChange(currentPage - 1, e)}
           disabled={currentPage === 0}
         >
-          Previous
+          Anterior
         </button>
 
         <span className="page-info">
-          Page {currentPage + 1} of {totalPages}
+          Página {currentPage + 1} de {totalPages}
         </span>
 
         <button
           onClick={(e) => handlePageChange(currentPage + 1, e)}
           disabled={currentPage === totalPages - 1}
         >
-          Next
+          Siguiente
         </button>
       </div>
     </div>
