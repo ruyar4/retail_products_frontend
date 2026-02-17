@@ -36,6 +36,12 @@ interface Filters {
   category: string
 }
 
+interface SortOption {
+  field: string
+  direction: 'asc' | 'desc'
+  label: string
+}
+
 const ProductCatalog = () => {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,17 +56,33 @@ const ProductCatalog = () => {
     brand: '',
     category: ''
   })
+  const [sortBy, setSortBy] = useState<string>('name')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+
+  const sortOptions: SortOption[] = [
+    { field: 'name', direction: 'asc', label: 'Name (A-Z)' },
+    { field: 'name', direction: 'desc', label: 'Name (Z-A)' },
+    { field: 'price', direction: 'asc', label: 'Price (Low to High)' },
+    { field: 'price', direction: 'desc', label: 'Price (High to Low)' },
+    { field: 'brand.name', direction: 'asc', label: 'Brand (A-Z)' },
+    { field: 'brand.name', direction: 'desc', label: 'Brand (Z-A)' },
+    { field: 'category.name', direction: 'asc', label: 'Category (A-Z)' },
+    { field: 'category.name', direction: 'desc', label: 'Category (Z-A)' }
+  ]
 
   const buildQueryString = (page: number) => {
     const params = new URLSearchParams({
       page: page.toString(),
-      size: '5'
+      size: '12'
     })
 
     if (filters.minPrice) params.append('minPrice', filters.minPrice)
     if (filters.maxPrice) params.append('maxPrice', filters.maxPrice)
     if (filters.brand) params.append('brand', filters.brand)
     if (filters.category) params.append('category', filters.category)
+
+    params.append('sortBy', sortBy)
+    params.append('sortDirection', sortDirection)
 
     return params.toString()
   }
@@ -124,7 +146,7 @@ const ProductCatalog = () => {
 
   useEffect(() => {
     fetchProducts(0)
-  }, [filters])
+  }, [filters, sortBy, sortDirection])
 
   const handleFilterChange = (filterType: keyof Filters, value: string) => {
     setFilters(prev => ({
@@ -141,6 +163,13 @@ const ProductCatalog = () => {
       brand: '',
       category: ''
     })
+    setCurrentPage(0)
+  }
+
+  const handleSortChange = (value: string) => {
+    const [field, direction] = value.split(':')
+    setSortBy(field)
+    setSortDirection(direction as 'asc' | 'desc')
     setCurrentPage(0)
   }
 
@@ -162,9 +191,22 @@ const ProductCatalog = () => {
       <h1>Product Catalog</h1>
 
       <div className="filters-section">
-        <h3>Filters</h3>
+        <h3>Filters & Sorting</h3>
 
         <div className="filters-grid">
+          <div className="filter-group">
+            <label>Sort By</label>
+            <select
+              value={`${sortBy}:${sortDirection}`}
+              onChange={(e) => handleSortChange(e.target.value)}
+            >
+              {sortOptions.map(option => (
+                <option key={`${option.field}:${option.direction}`} value={`${option.field}:${option.direction}`}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="filter-group">
             <label>Price Range</label>
             <div className="price-inputs">
