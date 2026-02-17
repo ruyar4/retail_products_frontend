@@ -1,0 +1,254 @@
+import { useState, useEffect } from 'react'
+
+interface Brand {
+  id: number
+  name: string
+}
+
+interface Category {
+  id: number
+  name: string
+}
+
+interface Product {
+  id: number
+  name: string
+  description: string
+  price: number
+  brand: Brand
+  category: Category
+}
+
+interface ApiResponse {
+  content: Product[]
+  totalPages: number
+  totalElements: number
+  first: boolean
+  last: boolean
+  size: number
+  number: number
+}
+
+interface Filters {
+  minPrice: string
+  maxPrice: string
+  brand: string
+  category: string
+}
+
+const ProductCatalog = () => {
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const [brands, setBrands] = useState<Brand[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [filters, setFilters] = useState<Filters>({
+    minPrice: '',
+    maxPrice: '',
+    brand: '',
+    category: ''
+  })
+
+  const buildQueryString = (page: number) => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: '5'
+    })
+
+    if (filters.minPrice) params.append('minPrice', filters.minPrice)
+    if (filters.maxPrice) params.append('maxPrice', filters.maxPrice)
+    if (filters.brand) params.append('brand', filters.brand)
+    if (filters.category) params.append('category', filters.category)
+
+    return params.toString()
+  }
+
+  const fetchProducts = async (page: number) => {
+    try {
+      setLoading(true)
+      const queryString = buildQueryString(page)
+      const response = await fetch(`http://localhost:8080/api/products?${queryString}`)
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch products')
+      }
+
+      const data: ApiResponse = await response.json()
+      setProducts(data.content)
+      setTotalPages(data.totalPages)
+      setCurrentPage(data.number)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const extractUniqueBrands = (products: Product[]): Brand[] => {
+    const brandMap = new Map<number, Brand>()
+    products.forEach(product => {
+      brandMap.set(product.brand.id, product.brand)
+    })
+    return Array.from(brandMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+  }
+
+  const extractUniqueCategories = (products: Product[]): Category[] => {
+    const categoryMap = new Map<number, Category>()
+    products.forEach(product => {
+      categoryMap.set(product.category.id, product.category)
+    })
+    return Array.from(categoryMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+  }
+
+  const fetchAllProductsForFilters = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/products?page=0&size=1000')
+      if (response.ok) {
+        const data: ApiResponse = await response.json()
+        const uniqueBrands = extractUniqueBrands(data.content)
+        const uniqueCategories = extractUniqueCategories(data.content)
+        setBrands(uniqueBrands)
+        setCategories(uniqueCategories)
+      }
+    } catch (err) {
+      console.error('Failed to fetch products for filters:', err)
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts(0)
+    fetchAllProductsForFilters()
+  }, [])
+
+  useEffect(() => {
+    fetchProducts(0)
+  }, [filters])
+
+  const handleFilterChange = (filterType: keyof Filters, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }))
+    setCurrentPage(0)
+  }
+
+  const clearFilters = () => {
+    setFilters({
+      minPrice: '',
+      maxPrice: '',
+      brand: '',
+      category: ''
+    })
+    setCurrentPage(0)
+  }
+
+  const handlePageChange = (page: number, event?: React.MouseEvent) => {
+    event?.preventDefault()
+    fetchProducts(page)
+  }
+
+  if (loading) {
+    return <div className="loading">Loading products...</div>
+  }
+
+  if (error) {
+    return <div className="error">Error: {error}</div>
+  }
+
+  return (
+    <div className="product-catalog">
+      <h1>Product Catalog</h1>
+
+      <div className="filters-section">
+        <h3>Filters</h3>
+
+        <div className="filters-grid">
+          <div className="filter-group">
+            <label>Price Range</label>
+            <div className="price-inputs">
+              <input
+                type="number"
+                placeholder="Min Price"
+                value={filters.minPrice}
+                onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+              />
+              <span>-</span>
+              <input
+                type="number"
+                placeholder="Max Price"
+                value={filters.maxPrice}
+                onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="filter-group">
+            <label>Brand</label>
+            <select
+              value={filters.brand}
+              onChange={(e) => handleFilterChange('brand', e.target.value)}
+            >
+              <option value="">All Brands</option>
+              {brands.map(brand => (
+                <option key={brand.id} value={brand.name}>{brand.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>Category</label>
+            <select
+              value={filters.category}
+              onChange={(e) => handleFilterChange('category', e.target.value)}
+            >
+              <option value="">All Categories</option>
+              {categories.map(category => (
+                <option key={category.id} value={category.name}>{category.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-actions">
+            <button onClick={clearFilters}>Clear Filters</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="products-grid">
+        {products.map((product) => (
+          <div key={product.id} className="product-card">
+            <h3>{product.name}</h3>
+            <p className="brand">{product.brand.name}</p>
+            <p className="category">{product.category.name}</p>
+            <p className="description">{product.description}</p>
+            <p className="price">${product.price.toFixed(2)}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="pagination">
+        <button
+          onClick={(e) => handlePageChange(currentPage - 1, e)}
+          disabled={currentPage === 0}
+        >
+          Previous
+        </button>
+
+        <span className="page-info">
+          Page {currentPage + 1} of {totalPages}
+        </span>
+
+        <button
+          onClick={(e) => handlePageChange(currentPage + 1, e)}
+          disabled={currentPage === totalPages - 1}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export default ProductCatalog
