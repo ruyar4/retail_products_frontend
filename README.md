@@ -1,73 +1,139 @@
-# React + TypeScript + Vite
+# Retail Products Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based frontend application for browsing and filtering retail products. Built with TypeScript, Vite, and modern React patterns.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Product Catalog**: Browse products with detailed information including name, description, price, brand, and category
+- **Advanced Filtering**: Filter products by price range, brand, and category
+- **Sorting Options**: Sort products by name, price, brand, or category in ascending/descending order
+- **Pagination**: Navigate through product pages efficiently
+- **Responsive Design**: Modern, responsive UI that works across devices
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 19** - Frontend framework
+- **TypeScript** - Type safety and better developer experience
+- **Vite** - Fast build tool and development server
+- **Vitest** - Unit testing framework
+- **ESLint** - Code linting and quality
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js (version 16 or higher)
+- npm or yarn
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd retail_products_front
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Create environment file:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+4. Configure your API base URL in `.env.local`:
+   ```
+   VITE_API_BASE_URL=your-api-base-url
+   ```
+
+### Development
+
+Start the development server:
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The application will be available at `http://localhost:5173`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Build
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Create a production build:
+```bash
+npm run build
 ```
+
+### Testing
+
+Run tests:
+```bash
+npm run test
+```
+
+Run tests with UI:
+```bash
+npm run test:ui
+```
+
+### Linting
+
+Check code quality:
+```bash
+npm run lint
+```
+
+## Project Structure
+
+```
+src/
+├── App.tsx              # Main application component
+├── ProductCatalog.tsx   # Product catalog with filtering and pagination
+├── App.css              # Application styles
+├── ProductCatalog.css   # Product catalog styles
+├── main.tsx            # Application entry point
+├── assets/             # Static assets
+└── test/               # Test files
+```
+
+## API Integration
+
+The application expects a REST API with the following endpoints:
+
+- `GET /api/products` - Retrieve paginated products with filtering and sorting
+  - Query parameters: `page`, `size`, `minPrice`, `maxPrice`, `brand`, `category`, `sortBy`, `sortDirection`
+  - Response format: `{ content: Product[], totalPages: number, totalElements: number, ... }`
+
+### Product Data Structure
+
+```typescript
+interface Product {
+  id: number
+  name: string
+  description: string
+  price: number
+  brand: {
+    id: number
+    name: string
+  }
+  category: {
+    id: number
+    name: string
+  }
+}
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Make your changes
+4. Run tests: `npm run test`
+5. Run linting: `npm run lint`
+6. Commit your changes: `git commit -am 'Add new feature'`
+7. Push to the branch: `git push origin feature/new-feature`
+8. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
