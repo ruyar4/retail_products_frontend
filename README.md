@@ -122,18 +122,3 @@ interface Product {
   }
 }
 ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-feature`
-3. Make your changes
-4. Run tests: `npm run test`
-5. Run linting: `npm run lint`
-6. Commit your changes: `git commit -am 'Add new feature'`
-7. Push to the branch: `git push origin feature/new-feature`
-8. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License.
