@@ -91,7 +91,7 @@ const ProductCatalog = () => {
     try {
       setLoading(true)
       const queryString = buildQueryString(page)
-      const response = await fetch(`http://localhost:8080/api/products?${queryString}`)
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/products?${queryString}`)
 
       if (!response.ok) {
         throw new Error('Error al cargar los productos')
@@ -126,7 +126,7 @@ const ProductCatalog = () => {
 
   const fetchAllProductsForFilters = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/products?page=0&size=1000')
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/products?page=0&size=1000`)
       if (response.ok) {
         const data: ApiResponse = await response.json()
         const uniqueBrands = extractUniqueBrands(data.content)
