@@ -2,6 +2,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi, beforeEach, afterEach, describe, it, expect } from 'vitest'
 import ProductCatalog from './ProductCatalog'
+import { CartProvider } from './contexts/CartContext'
 
 const mockProducts = {
   content: [
@@ -64,7 +65,7 @@ describe('ProductCatalog', () => {
 
   it('renders loading state initially', () => {
     mockFetch.mockImplementation(() => new Promise(() => {}))
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
     expect(screen.getByText('Cargando productos...')).toBeInTheDocument()
   })
 
@@ -74,7 +75,7 @@ describe('ProductCatalog', () => {
       json: () => Promise.resolve(mockProducts),
     })
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(screen.getByText('Test Product 1')).toBeInTheDocument()
@@ -90,7 +91,7 @@ describe('ProductCatalog', () => {
   it('renders error state when fetch fails', async () => {
     mockFetch.mockRejectedValue(new Error('Network error'))
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(screen.getByText(/Error:/)).toBeInTheDocument()
@@ -102,7 +103,7 @@ describe('ProductCatalog', () => {
       ok: false,
     })
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(screen.getByText('Error: Error al cargar los productos')).toBeInTheDocument()
@@ -115,7 +116,7 @@ describe('ProductCatalog', () => {
       json: () => Promise.resolve(mockProducts),
     })
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(screen.getByText('Página 1 de 2')).toBeInTheDocument()
@@ -128,7 +129,7 @@ describe('ProductCatalog', () => {
       json: () => Promise.resolve(mockProducts),
     })
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(screen.getByText('Test Product 1')).toBeInTheDocument()
@@ -157,7 +158,7 @@ describe('ProductCatalog', () => {
       json: () => Promise.resolve(mockProducts),
     })
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(screen.getByText('Test Product 1')).toBeInTheDocument()
@@ -173,7 +174,7 @@ describe('ProductCatalog', () => {
       json: () => Promise.resolve(mockProducts),
     })
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(screen.getByText('Test Product 1')).toBeInTheDocument()
@@ -200,7 +201,7 @@ describe('ProductCatalog', () => {
       json: () => Promise.resolve(mockProducts),
     })
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(screen.getByText('Test Product 1')).toBeInTheDocument()
@@ -229,7 +230,7 @@ describe('ProductCatalog', () => {
       json: () => Promise.resolve(mockProducts),
     })
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(screen.getByText('Test Product 1')).toBeInTheDocument()
@@ -251,7 +252,7 @@ describe('ProductCatalog', () => {
       json: () => Promise.resolve(mockProducts),
     })
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(screen.getAllByText('Brand A')).toHaveLength(2)
@@ -270,7 +271,7 @@ describe('ProductCatalog', () => {
       json: () => Promise.resolve(mockProducts),
     })
 
-    render(<ProductCatalog />)
+    render(<CartProvider><ProductCatalog /></CartProvider>)
 
     await waitFor(() => {
       expect(mockFetch).toHaveBeenNthCalledWith(1,

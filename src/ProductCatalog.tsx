@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useCart } from './contexts/CartContext'
 
 interface Brand {
   id: number
@@ -43,6 +44,7 @@ interface SortOption {
 }
 
 const ProductCatalog = () => {
+  const { addItem } = useCart()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -91,7 +93,7 @@ const ProductCatalog = () => {
     try {
       setLoading(true)
       const queryString = buildQueryString(page)
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/products?${queryString}`)
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products?${queryString}`)
 
       if (!response.ok) {
         throw new Error('Error al cargar los productos')
@@ -126,7 +128,7 @@ const ProductCatalog = () => {
 
   const fetchAllProductsForFilters = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/products?page=0&size=1000`)
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products?page=0&size=1000`)
       if (response.ok) {
         const data: ApiResponse = await response.json()
         const uniqueBrands = extractUniqueBrands(data.content)
@@ -178,6 +180,14 @@ const ProductCatalog = () => {
     fetchProducts(page)
   }
 
+  const handleAddToCart = async (product: Product) => {
+    try {
+      await addItem(product)
+    } catch (error) {
+      console.error('Failed to add item to cart:', error)
+    }
+  }
+
   if (loading) {
     return <div className="loading">Cargando productos...</div>
   }
@@ -188,7 +198,6 @@ const ProductCatalog = () => {
 
   return (
     <div className="product-catalog">
-      <h1>Catálogo de Productos</h1>
 
       <div className="filters-section">
         <h3>Filtros y Ordenamiento</h3>
@@ -266,6 +275,12 @@ const ProductCatalog = () => {
             <p className="category">{product.category.name}</p>
             <p className="description">{product.description}</p>
             <p className="price">${product.price.toFixed(2)}</p>
+            <button
+              className="add-to-cart-btn"
+              onClick={() => handleAddToCart(product)}
+            >
+              Agregar al Carrito
+            </button>
           </div>
         ))}
       </div>
